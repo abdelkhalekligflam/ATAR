@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ATAR — أثر
 
-## Getting Started
+A multilingual digital museum built with Next.js, TypeScript and Tailwind CSS.
 
-First, run the development server:
+## Run
 
-```bash
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `/fr`, `/en` or `/ar`. The root redirects to French.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Responsive museum-inspired home, timeline explorer, detail and editorial pages.
+- French, English and Arabic content, including RTL layouts.
+- Search, era and theme filters, chronological sorting, reset and empty states.
+- Dark/light theme toggle (session state).
+- Six sourced introductory heritage milestones. The planned collection of 20 events and international parallel narratives remain future editorial work.
 
-## Learn More
+## Content and images
 
-To learn more about Next.js, take a look at the following resources:
+`src/lib/history.ts` contains the initial notices and UNESCO references. Approximate periods are displayed as ranges or centuries. The imported Stitch illustrations have unverified provenance and are labelled accordingly. They must not be presented as authentic archival photographs. Historical border mapping is not implemented.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Checks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```sh
+npm run lint
+npm run build
+```

@@ -1,0 +1,12 @@
+"use client";
+import { useState } from "react";
+import { events, type Language } from "@/lib/history";
+import { copy } from "@/lib/i18n";
+import { EventCard } from "./event-card";
+function normalize(text: string) { return text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+export function Explorer({lang,initialEra}: {lang: Language; initialEra: string}) {
+ const t=copy[lang]; const [era,setEra]=useState(initialEra); const [theme,setTheme]=useState('all'); const [query,setQuery]=useState(''); const [desc,setDesc]=useState(false);
+ const filtered=events.filter(e => (era==='all'||e.era===era)&&(theme==='all'||e.theme===theme)&&normalize(e.title[lang]+' '+e.place[lang]+' '+e.summary[lang]+' '+e.date[lang]).includes(normalize(query.trim()))).sort((a,b)=>desc ? b.year-a.year : a.year-b.year);
+ function reset() {setEra('all');setTheme('all');setQuery('');setDesc(false);}
+ return <main className="container explorer section" id="content"><p className="eyebrow">ATAR / {t.explore}</p><h1>{t.explorerTitle}</h1><p className="hero-description">{t.explorerIntro}</p><div className="filters"><label className="search-label"><span className="sr-only">{t.search}</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t.search}/></label><div className="filter-row"><span className="filter-label">{t.eras}</span>{(['all','ancient','medieval','modern','contemporary'] as const).map(key=><button key={key} aria-pressed={era===key} onClick={()=>setEra(key)}>{t[key]}</button>)}</div><div className="filter-row"><span className="filter-label">{t.collection}</span>{(['all','culture','politics','trade'] as const).map(key=><button key={key} aria-pressed={theme===key} onClick={()=>setTheme(key)}>{t[key]}</button>)}</div><div className="filter-bottom"><span role="status">{filtered.length} {t.results}</span><label><span className="sr-only">{t.order}</span><select value={desc?'desc':'asc'} onChange={e=>setDesc(e.target.value==='desc')}><option value="asc">{t.oldest}</option><option value="desc">{t.newest}</option></select></label><button onClick={reset}>{t.reset}</button></div></div><div className="timeline-list">{filtered.map(e=><div className="timeline-entry" key={e.slug}><span className="timeline-dot"/><EventCard event={e} lang={lang}/></div>)}</div>{filtered.length===0&&<div className="empty"><h2>{t.empty}</h2><button className="button" onClick={reset}>{t.reset}</button></div>}</main>;
+}
