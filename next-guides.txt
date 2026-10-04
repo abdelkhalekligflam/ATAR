@@ -1,0 +1,820 @@
+﻿---
+title: Layouts and Pages
+description: Learn how to create your first pages and layouts, and link between them with the Link component.
+related:
+  title: API Reference
+  description: Learn more about the features mentioned in this page by reading the API Reference.
+  links:
+    - app/getting-started/linking-and-navigating
+    - app/api-reference/file-conventions/layout
+    - app/api-reference/file-conventions/page
+    - app/api-reference/components/link
+    - app/api-reference/file-conventions/dynamic-routes
+---
+
+Next.js uses **file-system based routing**, meaning you can use folders and files to define routes. This page will guide you through how to create layouts and pages, and link between them.
+
+## Creating a page
+
+A **page** is UI that is rendered on a specific route. To create a page, add a [`page` file](/docs/app/api-reference/file-conventions/page) inside the `app` directory and default export a React component. For example, to create an index page (`/`):
+
+<Image
+  alt="page.js special file"
+  srcLight="/docs/light/page-special-file.png"
+  srcDark="/docs/dark/page-special-file.png"
+  width="1600"
+  height="282"
+/>
+
+```tsx filename="app/page.tsx" switcher
+export default function Page() {
+  return <h1>Hello Next.js!</h1>
+}
+```
+
+```jsx filename="app/page.js" switcher
+export default function Page() {
+  return <h1>Hello Next.js!</h1>
+}
+```
+
+## Creating a layout
+
+A layout is UI that is **shared** between multiple pages. On navigation, layouts preserve state, remain interactive, and do not rerender.
+
+You can define a layout by default exporting a React component from a [`layout` file](/docs/app/api-reference/file-conventions/layout). The component should accept a `children` prop which can be a page or another [layout](#nesting-layouts).
+
+For example, to create a layout that accepts your index page as child, add a `layout` file inside the `app` directory:
+
+<Image
+  alt="layout.js special file"
+  srcLight="/docs/light/layout-special-file.png"
+  srcDark="/docs/dark/layout-special-file.png"
+  width="1600"
+  height="363"
+/>
+
+```tsx filename="app/layout.tsx" switcher
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        {/* Layout UI */}
+        {/* Place children where you want to render a page or nested layout */}
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+```
+
+```jsx filename="app/layout.js" switcher
+export default function DashboardLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {/* Layout UI */}
+        {/* Place children where you want to render a page or nested layout */}
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+```
+
+The layout above is called a [root layout](/docs/app/api-reference/file-conventions/layout#root-layout) because it's defined at the root of the `app` directory. The root layout is **required** and must contain `html` and `body` tags.
+
+## Creating a nested route
+
+A nested route is a route composed of multiple URL segments. For example, the `/blog/[slug]` route is composed of three segments:
+
+- `/` (Root Segment)
+- `blog` (Segment)
+- `[slug]` (Leaf Segment)
+
+In Next.js:
+
+- **Folders** are used to define the route segments that map to URL segments.
+- **Files** (like `page` and `layout`) are used to create UI that is shown for a segment.
+
+To create nested routes, you can nest folders inside each other. For example, to add a route for `/blog`, create a folder called `blog` in the `app` directory. Then, to make `/blog` publicly accessible, add a `page.tsx` file:
+
+<Image
+  alt="File hierarchy showing blog folder and a page.js file"
+  srcLight="/docs/light/blog-nested-route.png"
+  srcDark="/docs/dark/blog-nested-route.png"
+  width="1600"
+  height="525"
+/>
+
+```tsx filename="app/blog/page.tsx" switcher
+// Dummy imports
+import { getPosts } from '@/lib/posts'
+import { Post } from '@/ui/post'
+
+export default async function Page() {
+  const posts = await getPosts()
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <Post key={post.id} post={post} />
+      ))}
+    </ul>
+  )
+}
+```
+
+```jsx filename="app/blog/page.js" switcher
+// Dummy imports
+import { getPosts } from '@/lib/posts'
+import { Post } from '@/ui/post'
+
+export default async function Page() {
+  const posts = await getPosts()
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <Post key={post.id} post={post} />
+      ))}
+    </ul>
+  )
+}
+```
+
+You can continue nesting folders to create nested routes. For example, to create a route for a specific blog post, create a new `[slug]` folder inside `blog` and add a `page` file:
+
+<Image
+  alt="File hierarchy showing blog folder with a nested slug folder and a page.js file"
+  srcLight="/docs/light/blog-post-nested-route.png"
+  srcDark="/docs/dark/blog-post-nested-route.png"
+  width="1600"
+  height="687"
+/>
+
+```tsx filename="app/blog/[slug]/page.tsx" switcher
+export function generateStaticParams() {}
+
+export default function Page() {
+  return <h1>Hello, Blog Post Page!</h1>
+}
+```
+
+```jsx filename="app/blog/[slug]/page.js" switcher
+export function generateStaticParams() {}
+
+export default function Page() {
+  return <h1>Hello, Blog Post Page!</h1>
+}
+```
+
+Wrapping a folder name in square brackets (e.g. `[slug]`) creates a [dynamic route segment](/docs/app/api-reference/file-conventions/dynamic-routes) which is used to generate multiple pages from data. e.g. blog posts, product pages, etc.
+
+## Nesting layouts
+
+By default, layouts in the folder hierarchy are also nested, which means they wrap child layouts via their `children` prop. You can nest layouts by adding `layout` inside specific route segments (folders).
+
+For example, to create a layout for the `/blog` route, add a new `layout` file inside the `blog` folder.
+
+<Image
+  alt="File hierarchy showing root layout wrapping the blog layout"
+  srcLight="/docs/light/nested-layouts.png"
+  srcDark="/docs/dark/nested-layouts.png"
+  width="1600"
+  height="768"
+/>
+
+```tsx filename="app/blog/layout.tsx" switcher
+export default function BlogLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <section>{children}</section>
+}
+```
+
+```jsx filename="app/blog/layout.js" switcher
+export default function BlogLayout({ children }) {
+  return <section>{children}</section>
+}
+```
+
+If you were to combine the two layouts above, the root layout (`app/layout.js`) would wrap the blog layout (`app/blog/layout.js`), which would wrap the blog (`app/blog/page.js`) and blog post page (`app/blog/[slug]/page.js`).
+
+## Creating a dynamic segment
+
+[Dynamic segments](/docs/app/api-reference/file-conventions/dynamic-routes) allow you to create routes that are generated from data. For example, instead of manually creating a route for each individual blog post, you can create a dynamic segment to generate the routes based on blog post data.
+
+To create a dynamic segment, wrap the segment (folder) name in square brackets: `[segmentName]`. For example, in the `app/blog/[slug]/page.tsx` route, the `[slug]` is the dynamic segment.
+
+```tsx filename="app/blog/[slug]/page.tsx" switcher
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const post = await getPost(slug)
+
+  return (
+    <div>
+      <h1>{post.title}</h1>
+      <p>{post.content}</p>
+    </div>
+  )
+}
+```
+
+```jsx filename="app/blog/[slug]/page.js" switcher
+export default async function BlogPostPage({ params }) {
+  const { slug } = await params
+  const post = await getPost(slug)
+
+  return (
+    <div>
+      <h1>{post.title}</h1>
+      <p>{post.content}</p>
+    </div>
+  )
+}
+```
+
+Learn more about [Dynamic Segments](/docs/app/api-reference/file-conventions/dynamic-routes) and the [`params`](/docs/app/api-reference/file-conventions/page#params-optional) props.
+
+Nested [layouts within Dynamic Segments](/docs/app/api-reference/file-conventions/layout#params-optional) can also access the `params` props.
+
+## Rendering with search params
+
+In a Server Component **page**, you can access search parameters using the [`searchParams`](/docs/app/api-reference/file-conventions/page#searchparams-optional) prop:
+
+```tsx filename="app/page.tsx" switcher
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const filters = (await searchParams).filters
+}
+```
+
+```jsx filename="app/page.jsx" switcher
+export default async function Page({ searchParams }) {
+  const filters = (await searchParams).filters
+}
+```
+
+Using `searchParams` opts your page into [**dynamic rendering**](/docs/app/glossary#dynamic-rendering) because it requires an incoming request to read the search parameters from.
+
+Client Components can read search params using the [`useSearchParams`](/docs/app/api-reference/functions/use-search-params) hook.
+
+Learn more about `useSearchParams` in [prerendered](/docs/app/api-reference/functions/use-search-params#prerendering) and [dynamically rendered](/docs/app/api-reference/functions/use-search-params#dynamic-rendering) routes.
+
+### What to use and when
+
+- Use the `searchParams` prop when you need search parameters to **load data for the page** (e.g. pagination, filtering from a database).
+- Use `useSearchParams` when search parameters are used **only on the client** (e.g. filtering a list already loaded via props).
+- As a small optimization, you can use `new URLSearchParams(window.location.search)` in **callbacks or event handlers** to read search params without triggering re-renders.
+
+## Linking between pages
+
+You can use the [`<Link>` component](/docs/app/api-reference/components/link) to navigate between routes. `<Link>` is a built-in Next.js component that extends the HTML `<a>` tag to provide [prefetching](/docs/app/getting-started/linking-and-navigating#prefetching) and [client-side navigation](/docs/app/getting-started/linking-and-navigating#client-side-transitions).
+
+For example, to generate a list of blog posts, import `<Link>` from `next/link` and pass a `href` prop to the component:
+
+```tsx filename="app/ui/post.tsx" highlight={1,2,11} switcher
+import Link from 'next/link'
+import { getPosts } from '@/lib/posts'
+
+export default async function Posts() {
+  const posts = await getPosts()
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.slug}>
+          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+```jsx filename="app/ui/post.js" highlight={1,2,11} switcher
+import Link from 'next/link'
+import { getPosts } from '@/lib/posts'
+
+export default async function Posts() {
+  const posts = await getPosts()
+
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.slug}>
+          <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+        </li>
+      ))}
+    </ul>
+  )
+}
+```
+
+> **Good to know**: `<Link>` is the primary way to navigate between routes in Next.js. You can also use the [`useRouter` hook](/docs/app/api-reference/functions/use-router) for more advanced navigation.
+
+## Route Props Helpers
+
+Next.js exposes utility types that infer `params` and named slots from your route structure:
+
+- [**PageProps**](/docs/app/api-reference/file-conventions/page#page-props-helper): Props for `page` components, including `params` and `searchParams`.
+- [**LayoutProps**](/docs/app/api-reference/file-conventions/layout#layout-props-helper): Props for `layout` components, including `children` and any named slots (e.g. folders like `@analytics`).
+
+These are globally available helpers, generated when running either `next dev`, `next build` or [`next typegen`](/docs/app/api-reference/cli/next#next-typegen-options).
+
+```tsx filename="app/blog/[slug]/page.tsx"
+export default async function Page(props: PageProps<'/blog/[slug]'>) {
+  const { slug } = await props.params
+  return <h1>Blog post: {slug}</h1>
+}
+```
+
+```tsx filename="app/dashboard/layout.tsx"
+export default function Layout(props: LayoutProps<'/dashboard'>) {
+  return (
+    <section>
+      {props.children}
+      {/* If you have app/dashboard/@analytics, it appears as a typed slot: */}
+      {/* {props.analytics} */}
+    </section>
+  )
+}
+```
+
+> **Good to know**
+>
+> - Static routes resolve `params` to `{}`.
+> - `PageProps`, `LayoutProps` are global helpers — no imports required.
+> - Types are generated during `next dev`, `next build` or `next typegen`.
+---
+title: CSS
+description: Learn about the different ways to add CSS to your application, including Tailwind CSS, CSS Modules, Global CSS, and more.
+related:
+  title: Next Steps
+  description: Learn more about the alternatives ways you can use CSS in your application.
+  links:
+    - app/guides/tailwind-v3-css
+    - app/guides/sass
+    - app/guides/css-in-js
+---
+
+Next.js provides several ways to style your application using CSS, including:
+
+- [Tailwind CSS](#tailwind-css)
+- [CSS Modules](#css-modules)
+- [Global CSS](#global-css)
+- [External Stylesheets](#external-stylesheets)
+- [Sass](/docs/app/guides/sass)
+- [CSS-in-JS](/docs/app/guides/css-in-js)
+
+## Tailwind CSS
+
+[Tailwind CSS](https://tailwindcss.com/) is a utility-first CSS framework that provides low-level utility classes to build custom designs.
+
+<AppOnly>
+
+Install Tailwind CSS:
+
+```bash package="pnpm"
+pnpm add -D tailwindcss @tailwindcss/postcss
+```
+
+```bash package="npm"
+npm install -D tailwindcss @tailwindcss/postcss
+```
+
+```bash package="yarn"
+yarn add -D tailwindcss @tailwindcss/postcss
+```
+
+```bash package="bun"
+bun add -D tailwindcss @tailwindcss/postcss
+```
+
+Add the PostCSS plugin to your `postcss.config.mjs` file:
+
+```js filename="postcss.config.mjs"
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+```
+
+Import Tailwind in your global CSS file:
+
+```css filename="app/globals.css"
+@import 'tailwindcss';
+```
+
+Import the CSS file in your root layout:
+
+```tsx filename="app/layout.tsx" switcher
+import './globals.css'
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+```jsx filename="app/layout.js" switcher
+import './globals.css'
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+Now you can start using Tailwind's utility classes in your application:
+
+```tsx filename="app/page.tsx" switcher
+export default function Page() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
+    </main>
+  )
+}
+```
+
+```jsx filename="app/page.js" switcher
+export default function Page() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
+    </main>
+  )
+}
+```
+
+</AppOnly>
+
+<PagesOnly>
+
+Install Tailwind CSS:
+
+```bash package="pnpm"
+pnpm add -D tailwindcss @tailwindcss/postcss
+```
+
+```bash package="npm"
+npm install -D tailwindcss @tailwindcss/postcss
+```
+
+```bash package="yarn"
+yarn add -D tailwindcss @tailwindcss/postcss
+```
+
+```bash package="bun"
+bun add -D tailwindcss @tailwindcss/postcss
+```
+
+Add the PostCSS plugin to your `postcss.config.mjs` file:
+
+```js filename="postcss.config.mjs"
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+```
+
+Import Tailwind in your global CSS file:
+
+```css filename="styles/globals.css"
+@import 'tailwindcss';
+```
+
+Import the CSS file in your `pages/_app.js` file:
+
+```jsx filename="pages/_app.js"
+import '@/styles/globals.css'
+
+export default function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />
+}
+```
+
+Now you can start using Tailwind's utility classes in your application:
+
+```tsx filename="pages/index.tsx" switcher
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
+    </main>
+  )
+}
+```
+
+```jsx filename="pages/index.js" switcher
+export default function Home() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <h1 className="text-4xl font-bold">Welcome to Next.js!</h1>
+    </main>
+  )
+}
+```
+
+</PagesOnly>
+
+> **Good to know:** If you need broader browser support for very old browsers, see the [Tailwind CSS v3 setup instructions](/docs/app/guides/tailwind-v3-css).
+
+## CSS Modules
+
+CSS Modules locally scope CSS by generating unique class names. This allows you to use the same class in different files without worrying about naming collisions.
+
+<AppOnly>
+
+To start using CSS Modules, create a new file with the extension `.module.css` and import it into any component inside the `app` directory:
+
+```css filename="app/blog/blog.module.css"
+.blog {
+  padding: 24px;
+}
+```
+
+```tsx filename="app/blog/page.tsx" switcher
+import styles from './blog.module.css'
+
+export default function Page() {
+  return <main className={styles.blog}></main>
+}
+```
+
+```jsx filename="app/blog/page.js" switcher
+import styles from './blog.module.css'
+
+export default function Page() {
+  return <main className={styles.blog}></main>
+}
+```
+
+</AppOnly>
+
+<PagesOnly>
+
+To start using CSS Modules, create a new file with the extension `.module.css` and import it into any component inside the `pages` directory:
+
+```css filename="styles/blog.module.css"
+.blog {
+  padding: 24px;
+}
+```
+
+```tsx filename="pages/blog/index.tsx" switcher
+import styles from '@/styles/blog.module.css'
+
+export default function Page() {
+  return <main className={styles.blog}></main>
+}
+```
+
+```jsx filename="pages/blog/index.js" switcher
+import styles from '@/styles/blog.module.css'
+
+export default function Page() {
+  return <main className={styles.blog}></main>
+}
+```
+
+</PagesOnly>
+
+## Global CSS
+
+You can use global CSS to apply styles across your application.
+
+<AppOnly>
+
+Create a `app/global.css` file and import it in the root layout to apply the styles to **every route** in your application:
+
+```css filename="app/global.css"
+body {
+  padding: 20px 20px 60px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+```
+
+```tsx filename="app/layout.tsx" switcher
+// These styles apply to every route in the application
+import './global.css'
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+```jsx filename="app/layout.js" switcher
+// These styles apply to every route in the application
+import './global.css'
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+> **Good to know:** Global styles can be imported into any layout, page, or component inside the `app` directory. However, since Next.js uses React's built-in support for stylesheets to integrate with Suspense, this currently does not remove stylesheets as you navigate between routes which can lead to conflicts. We recommend using global styles for _truly_ global CSS (like Tailwind's base styles), [Tailwind CSS](#tailwind-css) for component styling, and [CSS Modules](#css-modules) for custom scoped CSS when needed.
+
+</AppOnly>
+
+<PagesOnly>
+
+Import the stylesheet in the `pages/_app.js` file to apply the styles to **every route** in your application:
+
+```jsx filename="pages/_app.js"
+import '@/styles/global.css'
+
+export default function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />
+}
+```
+
+Due to the global nature of stylesheets, and to avoid conflicts, you should import them inside [`pages/_app.js`](/docs/pages/building-your-application/routing/custom-app).
+
+</PagesOnly>
+
+## External stylesheets
+
+<AppOnly>
+
+Stylesheets published by external packages can be imported anywhere in the `app` directory, including colocated components:
+
+```tsx filename="app/layout.tsx" switcher
+import 'bootstrap/dist/css/bootstrap.css'
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className="container">{children}</body>
+    </html>
+  )
+}
+```
+
+```jsx filename="app/layout.js" switcher
+import 'bootstrap/dist/css/bootstrap.css'
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className="container">{children}</body>
+    </html>
+  )
+}
+```
+
+> **Good to know:** In React 19, `<link rel="stylesheet" href="..." />` can also be used. See the [React `link` documentation](https://react.dev/reference/react-dom/components/link) for more information.
+
+</AppOnly>
+
+<PagesOnly>
+
+Next.js allows you to import CSS files from a JavaScript file. This is possible because Next.js extends the concept of [`import`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/import) beyond JavaScript.
+
+### Import styles from `node_modules`
+
+Since Next.js **9.5.4**, importing a CSS file from `node_modules` is permitted anywhere in your application.
+
+For global stylesheets, like `bootstrap` or `nprogress`, you should import the file inside `pages/_app.js`. For example:
+
+```jsx filename="pages/_app.js"
+import 'bootstrap/dist/css/bootstrap.css'
+
+export default function MyApp({ Component, pageProps }) {
+  return <Component {...pageProps} />
+}
+```
+
+To import CSS required by a third-party component, you can do so in your component. For example:
+
+```jsx filename="components/example-dialog.js"
+import { useState } from 'react'
+import { Dialog } from '@reach/dialog'
+import VisuallyHidden from '@reach/visually-hidden'
+import '@reach/dialog/styles.css'
+
+function ExampleDialog(props) {
+  const [showDialog, setShowDialog] = useState(false)
+  const open = () => setShowDialog(true)
+  const close = () => setShowDialog(false)
+
+  return (
+    <div>
+      <button onClick={open}>Open Dialog</button>
+      <Dialog isOpen={showDialog} onDismiss={close}>
+        <button className="close-button" onClick={close}>
+          <VisuallyHidden>Close</VisuallyHidden>
+          <span aria-hidden>×</span>
+        </button>
+        <p>Hello there. I am a dialog</p>
+      </Dialog>
+    </div>
+  )
+}
+```
+
+</PagesOnly>
+
+## Ordering and Merging
+
+Next.js optimizes CSS during production builds by automatically chunking (merging) stylesheets. The **order of your CSS** depends on the **order you import styles in your code**.
+
+For example, `base-button.module.css` will be ordered before `page.module.css` since `<BaseButton>` is imported before `page.module.css`:
+
+```tsx filename="page.tsx" switcher
+import { BaseButton } from './base-button'
+import styles from './page.module.css'
+
+export default function Page() {
+  return <BaseButton className={styles.primary} />
+}
+```
+
+```jsx filename="page.js" switcher
+import { BaseButton } from './base-button'
+import styles from './page.module.css'
+
+export default function Page() {
+  return <BaseButton className={styles.primary} />
+}
+```
+
+```tsx filename="base-button.tsx" switcher
+import styles from './base-button.module.css'
+
+export function BaseButton() {
+  return <button className={styles.primary} />
+}
+```
+
+```jsx filename="base-button.js" switcher
+import styles from './base-button.module.css'
+
+export function BaseButton() {
+  return <button className={styles.primary} />
+}
+```
+
+### Recommendations
+
+To keep CSS ordering predictable:
+
+- Try to contain CSS imports to a single JavaScript or TypeScript entry file
+- Import global styles and Tailwind stylesheets in the root of your application.
+- **Use Tailwind CSS** for most styling needs as it covers common design patterns with utility classes.
+- Use CSS Modules for component-specific styles when Tailwind utilities aren't sufficient.
+- Use a consistent naming convention for your CSS modules. For example, using `<name>.module.css` over `<name>.tsx`.
+- Extract shared styles into shared components to avoid duplicate imports.
+- Turn off linters or formatters that auto-sort imports like ESLint’s [`sort-imports`](https://eslint.org/docs/latest/rules/sort-imports).
+- You can use the [`cssChunking`](/docs/app/api-reference/config/next-config-js/cssChunking) option in `next.config.js` to control how CSS is chunked.
+
+## Development vs Production
+
+- In development (`next dev`), CSS updates apply instantly with [Fast Refresh](/docs/architecture/fast-refresh).
+- In production (`next build`), all CSS files are automatically concatenated into **many minified and code-split** `.css` files, ensuring the minimal amount of CSS is loaded for a route.
+- CSS still loads with JavaScript disabled in production, but JavaScript is required in development for Fast Refresh.
+- CSS ordering can behave differently in development, always ensure to check the build (`next build`) to verify the final CSS order.
