@@ -25,7 +25,7 @@ Dark/light preference persists in local storage. Locale switching preserves filt
 
 ## Editorial notes
 
-Period boundaries are navigation conventions and are not universal cultural divisions. No year zero is used. The species-origin date is an approximate age, not an exact BCE date. Eleven cinematic images were generated with the built-in image generator and optimized as WebP. They are artistic interpretations, not archival evidence or exact event reconstructions. The public-domain Natural Earth land dataset supplies present-day coastlines, with indicative regional markers and no historical borders. Source references are recorded in `src/lib/history.ts`; editorial review date: 2026-10-04.
+Period boundaries are navigation conventions and are not universal cultural divisions. No year zero is used. The species-origin date is an approximate age, not an exact BCE date. Twelve cinematic images were generated with the built-in image generator and optimized as WebP. They are artistic interpretations, not archival evidence or exact event reconstructions. The public-domain Natural Earth land dataset supplies present-day coastlines, with indicative regional markers and no historical borders. Source references are recorded in `src/lib/history.ts`; editorial review date: 2026-10-04.
 
 ## Checks
 
@@ -43,3 +43,7 @@ Asset prompts and provenance: `public/images/journey/ASSETS.md`.
 ## Compare stories
 
 `/[lang]/compare` juxtaposes two distinct events with era-grouped selectors, a swap control, six suggested pairs, dates, regions, summaries, impact and source links. Pairs can be shared via URL and retained when switching languages. Invalid or duplicate slugs resolve to a distinct regional counterpart, preferring the same era and theme before date proximity. Comparisons do not imply causation.
+
+## Premium experience
+
+An editorial portal introduces the journey, followed by a compact timeline, horizontal era gallery and interactive regional atlas. Year entry and advanced search filters appear on demand. The interface supports French, English and Arabic, mobile layouts, reduced motion and persistent light/dark themes. Manrope, Instrument Serif and Noto Sans Arabic are self-hosted; licenses and provenance are in `public/fonts/`.

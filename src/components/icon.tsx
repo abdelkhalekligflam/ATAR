@@ -1,0 +1,4 @@
+import type { SVGProps } from "react";
+type IconName="arrow"|"left"|"right"|"play"|"pause"|"sun"|"moon"|"menu"|"close"|"chevron"|"globe";
+const paths:Record<IconName,string>={arrow:"M5 19 19 5M5 5h14v14",left:"M19 12H5m6-6-6 6 6 6",right:"M5 12h14m-6-6 6 6-6 6",play:"m9 5 11 7-11 7Z",pause:"M8 5v14M16 5v14",sun:"M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",moon:"M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10Z",menu:"M4 8h16M4 16h16",close:"m6 6 12 12M6 18 18 6",chevron:"m7 10 5 5 5-5",globe:"M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM3 12h18M12 3c-5 5-5 13 0 18 5-5 5-13 0-18"};
+export function Icon({name,...props}:SVGProps<SVGSVGElement>&{name:IconName}){return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}><path d={paths[name]}/></svg>;}
