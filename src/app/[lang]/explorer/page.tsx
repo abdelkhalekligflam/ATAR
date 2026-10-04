@@ -1,3 +1,4 @@
+import { copy } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 import { isLanguage, eras, regions, themes } from "@/lib/history";
 import { Explorer } from "@/components/explorer";
@@ -7,3 +8,5 @@ export default async function Page({params,searchParams}: {params: Promise<{lang
  const initial={era:eras.some(v=>v===era)?era:'all',region:regions.some(v=>v===region)?region:'all',theme:themes.some(v=>v===theme)?theme:'all',query:value('query'),from:value('from'),to:value('to'),desc:value('desc')==='true'};
  return <Explorer key={JSON.stringify(initial)} lang={lang} initial={initial}/>;
 }
+
+export async function generateMetadata({params}:{params:Promise<{lang:string}>}){const {lang}=await params;return isLanguage(lang)?{title:copy[lang].explore,description:copy[lang].intro}:{};}
