@@ -43,3 +43,16 @@ Extreme close cinematic still life of an early Mesopotamian clay accounting tabl
 ## Map provenance
 
 `src/lib/world-land.ts` is derived from Natural Earth 1:110m land, public domain, via https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson . Coastlines are modern. No political or historical borders are displayed. Regional marker positions are navigation aids, not exact event locations.
+
+## american-independence.webp
+
+1776 Philadelphia inspired scene, exterior of an eighteenth-century brick civic hall with a small gathering of colonists in period clothing and horse-drawn vehicles, soft golden morning, broad cinematic view, no flags or readable signs
+
+Prompt style: wide 16:9 realistic historical concept art; teal shadows, amber highlights, atmospheric depth, documentary poster quality, quiet foreground for typography; artistic interpretation, not archival evidence or a precise reconstruction; no text, logos, lettering or watermarks. Built-in image generator, 2026-10-04.
+
+
+## french-revolution.webp
+
+1789 Paris inspired scene, a large crowd gathering in an eighteenth-century stone street leading toward a medieval fortress, period clothing, energetic but dignified atmosphere, golden sunlight and distant haze, no flags, no violence or gore
+
+Prompt style: wide 16:9 realistic historical concept art; teal shadows, amber highlights, atmospheric depth, documentary poster quality, quiet foreground for typography; artistic interpretation, not archival evidence or a precise reconstruction; no text, logos, lettering or watermarks. Built-in image generator, 2026-10-04.

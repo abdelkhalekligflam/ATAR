@@ -11,7 +11,7 @@ export type HistoryEvent = {slug: string; year: number; era: Era; region: Region
 export function isLanguage(value: string): value is Language { return languages.some(lang => lang === value); }
 export function formatDate(event: HistoryEvent, lang: Language): string {
  if(event.date) return event.date[lang];
- const number = Math.abs(event.year).toLocaleString(lang === 'ar' ? 'ar-u-nu-latn' : lang);
+ const number = Math.abs(event.year).toLocaleString(lang === 'ar' ? 'ar-u-nu-latn' : lang, {useGrouping:false});
  const prefix = event.approximate ? ({fr:'Vers ',en:'c. ',ar:'نحو '}[lang]) : '';
  return prefix + number + (event.year < 0 ? ({fr:' av. J.-C.',en:' BCE',ar:' قبل الميلاد'}[lang]) : '');
 }
