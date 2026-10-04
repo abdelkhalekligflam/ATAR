@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { isLanguage } from "@/lib/history";
+import { isLanguage, eras, regions, themes } from "@/lib/history";
 import { Explorer } from "@/components/explorer";
-export default async function Page({params,searchParams}: {params: Promise<{lang:string}>;searchParams: Promise<{era?:string}>}) {
- const {lang}=await params; if(!isLanguage(lang))notFound(); const {era}=await searchParams;
- const initialEra=era&&['ancient','medieval','modern','contemporary'].includes(era)?era:'all';
- return <Explorer key={initialEra} lang={lang} initialEra={initialEra}/>;
+export default async function Page({params,searchParams}: {params: Promise<{lang:string}>;searchParams: Promise<Record<string,string|string[]|undefined>>}) {
+ const {lang}=await params; if(!isLanguage(lang))notFound();const sp=await searchParams;const value=(key:string)=>typeof sp[key]==='string'?sp[key] as string:'';
+ const era=value('era'),region=value('region'),theme=value('theme');
+ const initial={era:eras.some(v=>v===era)?era:'all',region:regions.some(v=>v===region)?region:'all',theme:themes.some(v=>v===theme)?theme:'all',query:value('query'),from:value('from'),to:value('to'),desc:value('desc')==='true'};
+ return <Explorer key={JSON.stringify(initial)} lang={lang} initial={initial}/>;
 }

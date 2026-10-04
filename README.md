@@ -1,6 +1,6 @@
-# ATAR — أثر
+# ATAR — A history of the world
 
-A multilingual digital museum built with Next.js, TypeScript and Tailwind CSS.
+Multilingual world-history explorer built with Next.js, TypeScript and Tailwind CSS.
 
 ## Run
 
@@ -9,19 +9,23 @@ npm ci
 npm run dev
 ```
 
-Open `/fr`, `/en` or `/ar`. The root redirects to French.
+The root redirects to French. `/fr`, `/en`, `/ar` provide fully translated interfaces and event notices, with Arabic RTL.
 
-## Features
+## Collection
 
-- Responsive museum-inspired home, timeline explorer, detail and editorial pages.
-- French, English and Arabic content, including RTL layouts.
-- Search, era and theme filters, chronological sorting, reset and empty states.
-- Dark/light theme toggle (session state).
-- Six sourced introductory heritage milestones. The planned collection of 20 events and international parallel narratives remain future editorial work.
+47 selected world-history milestones span the emergence of Homo sapiens approximately 300,000 years ago through the entry into force of the High Seas Treaty in January 2026. Africa, Asia, the Near East, Europe, the Americas, Oceania and global events are represented. This is an introductory editorial selection, not an exhaustive history.
 
-## Content and images
+Each event includes a date, location, overview, historical significance and a source link. Approximate dates and conventional chronology markers are identified. Events near one another can be shown in “Elsewhere, in the same era”; proximity does not imply causation.
 
-`src/lib/history.ts` contains the initial notices and UNESCO references. Approximate periods are displayed as ranges or centuries. The imported Stitch illustrations have unverified provenance and are labelled accordingly. They must not be presented as authentic archival photographs. Historical border mapping is not implemented.
+## Explorer
+
+Search, six era filters, seven region filters, seven theme filters, signed year range (negative = BCE), chronological sorting, shareable filter URLs, reset, empty/error states and progressive loading.
+
+Dark/light preference persists in local storage. Locale switching preserves filter queries. Previous/next event navigation follows chronological order.
+
+## Editorial notes
+
+Period boundaries are navigation conventions and are not universal cultural divisions. No year zero is used. The species-origin date is an approximate age, not an exact BCE date. Original SVG engravings are symbolic illustrations and are not archival evidence. Source references are recorded in `src/lib/history.ts`; editorial review date: 2026-10-04.
 
 ## Checks
 
