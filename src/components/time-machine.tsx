@@ -1,0 +1,31 @@
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { events, eras, regions, formatDate, type Language, type Region } from "@/lib/history";
+import { copy } from "@/lib/i18n";
+import { journeyCopy } from "@/lib/journey-copy";
+import { sceneFor, nearestEvent, project, regionPoints } from "@/lib/journey";
+import { landPath } from "@/lib/world-land";
+export function TimeMachine({lang,initialSlug}:{lang:Language;initialSlug:string}){
+ const t=copy[lang],j=journeyCopy[lang];const [index,setIndex]=useState(()=>Math.max(0,events.findIndex(e=>e.slug===initialSlug)));const [playing,setPlaying]=useState(false);const [region,setRegion]=useState<Region>(()=>events.find(e=>e.slug===initialSlug)?.region??'middleEast');const [year,setYear]=useState('');const [error,setError]=useState(false);
+ const current=events[index];const eraIndex=eras.indexOf(current.era);const atEra=events.filter(e=>e.era===current.era);const regional=atEra.filter(e=>e.region===region);const panel=[...regional].sort((a,b)=>Math.abs(a.year-current.year)-Math.abs(b.year-current.year));
+
+ useEffect(()=>{const url=new URL(window.location.href);url.searchParams.set('event',events[index].slug);window.history.replaceState(null,'',url.pathname+url.search+url.hash);},[index]);
+ useEffect(()=>{if(!playing)return;const timer=setInterval(()=>setIndex(i=>i<events.length-1?i+1:0),6500);return()=>clearInterval(timer);},[playing]);
+ function choose(i:number){setIndex(i);setRegion(events[i].region);setPlaying(false);setError(false);}
+ function jump(e:React.FormEvent){e.preventDefault();const number=Number(year);if(!year.trim()||!Number.isInteger(number)||number===0||number<events[0].year||number>2026){setError(true);return;}choose(nearestEvent(number));}
+ return <><section className="time-stage" id="timecapsule" aria-label={j.voyage}>
+ <div className="scene-backdrop" key={sceneFor(current)}><Image src={`/images/journey/${sceneFor(current)}.webp`} alt="" fill sizes="100vw" preload={current.era==='ancient'}/></div><div className="scene-shade"/><div className="scene-grid" aria-hidden="true"/>
+ <div className="stage-top"><span className="signal"><i/> ATAR / {j.voyage}</span><span className="stage-coordinate">{String(index+1).padStart(2,'0')} / {events.length} · {j.years}</span></div>
+ <div className="stage-story" key={current.slug}><p className="scene-era">0{eraIndex+1} / {t[current.era]}</p><p className="scene-date">{formatDate(current,lang)}</p><h1>{current.title[lang]}</h1><p className="scene-summary">{current.summary[lang]}</p><Link href={`/${lang}/events/${current.slug}`} className="journey-button">{j.read}<span aria-hidden="true">↗</span></Link></div>
+ <span className="scene-stamp" aria-hidden="true">0{eraIndex+1}</span><div className="scene-bottom"><span>{current.place[lang]} / {t[current.region]}</span><span>{j.ai}</span></div>
+ <div className="time-dock"><div className="dock-heading"><span>{j.hint}</span><div className="transport"><button onClick={()=>choose(Math.max(0,index-1))} disabled={index===0} aria-label={j.prev}>←</button><button onClick={()=>setPlaying(!playing)} aria-label={playing?j.pause:j.play} aria-pressed={playing}>{playing?'Ⅱ':'▷'}</button><button onClick={()=>choose(Math.min(events.length-1,index+1))} disabled={index===events.length-1} aria-label={j.next}>→</button></div></div>
+ <div className="time-range"><div className="time-ticks" aria-hidden="true">{events.map((e,i)=><i key={e.slug} className={i===index?'active':''}/>)}</div><input type="range" min="0" max={events.length-1} value={index} onChange={e=>choose(Number(e.target.value))} aria-label={j.range} aria-valuetext={`${formatDate(current,lang)} — ${current.title[lang]}`}/></div>
+ <div className="dock-eras">{eras.map((era,i)=><button key={era} onClick={()=>choose(events.findIndex(e=>e.era===era))} aria-pressed={current.era===era}><span>0{i+1}</span>{t[era]}</button>)}</div>
+ <div className="dock-foot"><form onSubmit={jump}><label htmlFor="jump-year">{j.year}</label><input id="jump-year" type="number" step="1" value={year} onChange={e=>{setYear(e.target.value);setError(false);}} placeholder="−3200" aria-describedby="jump-note" aria-invalid={error}/><button type="submit">{j.jump} ↗</button></form><a href="#atlas" className="atlas-link">{j.elsewhere} ↓</a></div>{error&&<p className="jump-error" role="alert">{j.invalid}</p>}<p id="jump-note" className="dock-note">{j.jumpNote}</p></div>
+ </section>
+ <section className="atlas-section container" id="atlas"><div className="atlas-heading"><div><p className="eyebrow">02 / ATLAS</p><h2>{j.atlas}</h2></div><p>{j.atlasText}</p></div><div className="atlas-era-tabs">{eras.map(era=><button key={era} onClick={()=>choose(events.findIndex(e=>e.era===era))} aria-pressed={current.era===era}>{t[era]}</button>)}</div>
+ <div className="atlas-layout"><div className="atlas-map"><svg viewBox="0 0 720 360" role="img" aria-label={j.atlas}><defs><pattern id="atlas-grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M60 0H0V60" fill="none" stroke="currentColor" strokeOpacity=".08"/></pattern></defs><rect width="720" height="360" fill="url(#atlas-grid)"/><path d={landPath} className="map-land"/></svg>{regions.map(r=>{const[x,y]=project(regionPoints[r]);const count=atEra.filter(e=>e.region===r).length;return <button key={r} style={{left:`${x/720*100}%`,top:`${y/360*100}%`}} className={`map-pin ${region===r?'selected':''} ${count?'':'quiet'}`} onClick={()=>setRegion(r)} aria-label={`${t[r]} — ${count} ${t.results}`} aria-pressed={region===r}><i/><span>{t[r]} <b>{count}</b></span></button>;})}<div className="map-watermark" aria-hidden="true">ATAR ATLAS</div></div>
+ <div className="atlas-stories" aria-live="polite"><p className="eyebrow">{t[region]} / {t[current.era]}</p><h3>{j.elsewhere}</h3>{panel.length?panel.slice(0,3).map(e=><Link className="atlas-story" key={e.slug} href={`/${lang}/events/${e.slug}`}><span>{formatDate(e,lang)}</span><h4>{e.title[lang]} ↗</h4></Link>):<p className="atlas-empty">{j.empty}</p>}<Link className="text-link" href={`/${lang}/explorer?era=${current.era}&region=${region}`}>{j.archive} ↗</Link></div></div><p className="image-note">{j.map}</p><p className="image-note">{j.near}</p></section></>;
+}
